@@ -29,8 +29,6 @@
 #ifndef MBEDTLS_CIPHER_H
 #define MBEDTLS_CIPHER_H
 
-#define MBEDTLS_CIPHER_HASH
-
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "config.h"
 #else
@@ -422,8 +420,8 @@ int mbedtls_cipher_setup_with_hash( mbedtls_cipher_context_t *ctx,
                                     const mbedtls_md_info_t *md_info,
                                     int hash_of_plaintext );
 
-int mbedtls_cipher_get_hash( mbedtls_cipher_context_t *ctx, unsigned char *output );
-
+int mbedtls_cipher_get_hash( mbedtls_cipher_context_t *ctx, unsigned char *output )
+                                    
 int mbedtls_cipher_and_hash( const mbedtls_cipher_id_t cipher_id,
                              const mbedtls_md_info_t* md_info,
                              const unsigned char *input,
@@ -435,7 +433,6 @@ int mbedtls_cipher_and_hash( const mbedtls_cipher_id_t cipher_id,
                              const unsigned char *iv,
                              size_t iv_len,
                              unsigned char *cipher_text,
-                             size_t cipher_text_size,
                              size_t *cipher_text_length,
                              unsigned char *hash,
                              int hash_of_plaintext );

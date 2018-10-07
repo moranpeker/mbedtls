@@ -895,7 +895,7 @@ int mbedtls_cipher_finish( mbedtls_cipher_context_t *ctx,
             {
                 if( 0 != ( ret = mbedtls_md_update( ctx->md_ctx,
                                                     ctx->unprocessed_data,
-                                                    &ctx->unprocessed_len ) ) )
+                                                    ctx->unprocessed_len ) ) )
                 {
                     return( ret );
                 }   
@@ -1245,26 +1245,34 @@ int mbedtls_cipher_auth_decrypt( mbedtls_cipher_context_t *ctx,
 #endif /* MBEDTLS_CIPHER_MODE_AEAD */
 
 #if defined(MBEDTLS_CIPHER_HASH)
+
+int mbedtls_cipher_get_hash( mbedtls_cipher_context_t *ctx, unsigned char *output )
+{
+    int ret = 0;
+    ret = mbedtls_md_finish( ctx->md_ctx, output);
+    return( ret );
+}
+
+
 int mbedtls_cipher_and_hash( const mbedtls_cipher_id_t cipher_id,
-                                     const mbedtls_md_info_t* md_info,
-                                     const unsigned char *input,
-                                     size_t ilen,
-                                     const unsigned char *key,
-                                     int key_bitlen,
-                                     const mbedtls_operation_t operation,
-                                     mbedtls_cipher_padding_t mode,
-                                     const unsigned char *iv,
-                                     size_t iv_len,
-                                     unsigned char *cipher_text,
-                                     size_t cipher_text_size,
-                                     size_t *cipher_text_length,
-                                     unsigned char *hash,
-                                     int hash_of_plaintext )
+                             const mbedtls_md_info_t* md_info,
+                             const unsigned char *input,
+                             size_t ilen,
+                             const unsigned char *key,
+                             int key_bitlen,
+                             const mbedtls_operation_t operation,
+                             mbedtls_cipher_padding_t mode,
+                             const unsigned char *iv,
+                             size_t iv_len,
+                             unsigned char *cipher_text,
+                             size_t *cipher_text_length,
+                             unsigned char *hash,
+                             int hash_of_plaintext )
 {
     int ret = 0;
     mbedtls_cipher_context_t ctx;
-    mbedtls_cipher_info_t *cipher_info = NULL;
-
+    size_t output_size;
+    const mbedtls_cipher_info_t *cipher_info = NULL;
     mbedtls_cipher_init( &ctx );
 
     cipher_info = mbedtls_cipher_info_from_type( cipher_id );
@@ -1296,7 +1304,7 @@ int mbedtls_cipher_and_hash( const mbedtls_cipher_id_t cipher_id,
         return( ret );
 
     ret = mbedtls_cipher_finish( &ctx, cipher_text + *cipher_text_length,
-                                 cipher_text_size - *cipher_text_length );
+                                 &output_size );
     if( ret != 0 )
         return( ret );
 
@@ -1304,7 +1312,9 @@ int mbedtls_cipher_and_hash( const mbedtls_cipher_id_t cipher_id,
     if( ret != 0 )
         return( ret );
 
-    mbedtls_cipher_free( &ctx ); 
+    mbedtls_cipher_free( &ctx );
+
+    return( 0 );
 }
 #endif /* MBEDTLS_CIPHER_HASH */
 
