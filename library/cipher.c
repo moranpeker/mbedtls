@@ -170,6 +170,12 @@ void mbedtls_cipher_free( mbedtls_cipher_context_t *ctx )
     if( ctx->cipher_ctx )
         ctx->cipher_info->base->ctx_free_func( ctx->cipher_ctx );
 
+#if defined(MBEDTLS_CIPHER_HASH)
+    if( ctx->md_ctx != NULL )
+    {
+        mbedtls_md_free( ctx->md_ctx );
+    }
+#endif //MBEDTLS_CIPHER_HASH
     mbedtls_platform_zeroize( ctx, sizeof(mbedtls_cipher_context_t) );
 }
 
@@ -198,6 +204,38 @@ int mbedtls_cipher_setup( mbedtls_cipher_context_t *ctx, const mbedtls_cipher_in
 
     return( 0 );
 }
+
+#if defined(MBEDTLS_CIPHER_HASH)
+int mbedtls_cipher_setup_with_hash( mbedtls_cipher_context_t *ctx,
+                                    const mbedtls_cipher_info_t *cipher_info,
+                                    const mbedtls_md_info_t *md_info,
+                                    int hash_of_plaintext )
+{
+    int ret = 0;
+
+    ctx->md_ctx = mbedtls_calloc( 1, sizeof( mbedtls_md_context_t ) );
+    if( ctx->md_ctx == NULL )
+        return( MBEDTLS_ERR_MD_ALLOC_FAILED );
+
+    mbedtls_md_init( ctx->md_ctx );
+
+    ret = mbedtls_cipher_setup( ctx, cipher_info );
+    if ( ret != 0 )
+        return( ret );
+
+    ret = mbedtls_md_setup( ctx->md_ctx, md_info, 0 );
+    if ( ret != 0 )
+        return( ret );
+
+    ctx->hash_of_plaintext = hash_of_plaintext;
+
+    ret = mbedtls_md_starts( ctx->md_ctx );
+    if ( ret != 0 )
+        return( ret );
+    
+    return( 0 );
+}
+#endif /* MBEDTLS_CIPHER_HASH */
 
 int mbedtls_cipher_setkey( mbedtls_cipher_context_t *ctx, const unsigned char *key,
         int key_bitlen, const mbedtls_operation_t operation )
@@ -324,6 +362,33 @@ int mbedtls_cipher_update_ad( mbedtls_cipher_context_t *ctx,
 }
 #endif /* MBEDTLS_GCM_C || MBEDTLS_CHACHAPOLY_C */
 
+
+#if defined(MBEDTLS_CIPHER_HASH)
+int mbedtls_cipher_hash_update( mbedtls_cipher_context_t *ctx, const unsigned char *input,
+                                size_t ilen, unsigned char *output, size_t *olen )
+{
+    int ret = 0;
+    if( ctx->md_ctx != NULL )
+    {
+        if( ( ctx->hash_of_plaintext ) ^ ( ctx->operation == MBEDTLS_ENCRYPT ) )
+        {
+            if( 0 != ( ret = mbedtls_md_update( ctx->md_ctx, input, ilen ) ) )
+            {
+                return( ret );
+            }
+        }
+        else
+        {
+            if( 0 != ( ret = mbedtls_md_update( ctx->md_ctx, output, *olen ) ) )
+            {
+                return( ret );
+            }   
+        }
+    }
+    return( 0 );
+}
+#endif /* MBEDTLS_CIPHER_HASH */
+
 int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *input,
                    size_t ilen, unsigned char *output, size_t *olen )
 {
@@ -350,7 +415,13 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
         {
             return( ret );
         }
-
+    #if defined(MBEDTLS_CIPHER_HASH)
+        if( 0 != ( ret = mbedtls_cipher_hash_update( ctx, input, ilen,
+                                                     output, olen ) ) )
+        {
+            return( ret );
+        }
+    #endif
         return( 0 );
     }
 
@@ -426,6 +497,15 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
             output += block_size;
             ctx->unprocessed_len = 0;
 
+        #if defined(MBEDTLS_CIPHER_HASH)
+            if( 0 != ( ret = mbedtls_cipher_hash_update( ctx, ctx->unprocessed_data,
+                                                         block_size, output,
+                                                         olen ) ) )
+            {
+                return( ret );
+            }
+        #endif
+
             input += copy_len;
             ilen -= copy_len;
         }
@@ -470,7 +550,17 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
                 return( ret );
             }
 
+
+        #if defined(MBEDTLS_CIPHER_HASH)
+            if( 0 != ( ret = mbedtls_cipher_hash_update( ctx, input, ilen,
+                                                         output, &ilen ) ) )
+            {
+                return( ret );
+            }
+        #endif //MBEDTLS_CIPHER_HASH
+
             *olen += ilen;
+        
         }
 
         return( 0 );
@@ -488,7 +578,13 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
         }
 
         *olen = ilen;
-
+    #if defined(MBEDTLS_CIPHER_HASH)
+        if( 0 != ( ret = mbedtls_cipher_hash_update( ctx, input, ilen,
+                                                     output, olen ) ) )
+        {
+            return( ret );
+        }
+    #endif //MBEDTLS_CIPHER_HASH
         return( 0 );
     }
 #endif /* MBEDTLS_CIPHER_MODE_CFB */
@@ -503,7 +599,13 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
         }
 
         *olen = ilen;
-
+    #if defined(MBEDTLS_CIPHER_HASH)
+        if( 0 != ( ret = mbedtls_cipher_hash_update( ctx, input, ilen,
+                                                     output, olen ) ) )
+        {
+            return( ret );
+        }
+    #endif
         return( 0 );
     }
 #endif /* MBEDTLS_CIPHER_MODE_OFB */
@@ -519,7 +621,13 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
         }
 
         *olen = ilen;
-
+    #if defined(MBEDTLS_CIPHER_HASH)
+        if( 0 != ( ret = mbedtls_cipher_hash_update( ctx, input, ilen,
+                                                     output, olen ) ) )
+        {
+            return( ret );
+        }
+    #endif
         return( 0 );
     }
 #endif /* MBEDTLS_CIPHER_MODE_CTR */
@@ -559,7 +667,6 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
         return( 0 );
     }
 #endif /* MBEDTLS_CIPHER_MODE_STREAM */
-
     return( MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE );
 }
 
@@ -783,6 +890,17 @@ int mbedtls_cipher_finish( mbedtls_cipher_context_t *ctx,
                 return( 0 );
             }
 
+        #if defined(MBEDTLS_CIPHER_HASH)   
+            if( ( ctx->md_ctx != NULL ) && ( ctx->hash_of_plaintext) )
+            {
+                if( 0 != ( ret = mbedtls_md_update( ctx->md_ctx,
+                                                    ctx->unprocessed_data,
+                                                    &ctx->unprocessed_len ) ) )
+                {
+                    return( ret );
+                }   
+            }
+        #endif/* MBEDTLS_CIPHER_HASH */
             ctx->add_padding( ctx->unprocessed_data, mbedtls_cipher_get_iv_size( ctx ),
                     ctx->unprocessed_len );
         }
@@ -808,17 +926,40 @@ int mbedtls_cipher_finish( mbedtls_cipher_context_t *ctx,
 
         /* Set output size for decryption */
         if( MBEDTLS_DECRYPT == ctx->operation )
-            return ctx->get_padding( output, mbedtls_cipher_get_block_size( ctx ),
+        {
+            ret = ctx->get_padding( output, mbedtls_cipher_get_block_size( ctx ),
                                      olen );
+        #if defined(MBEDTLS_CIPHER_HASH)                     
+            if( ret == 0 )
+            {
+                if( ( ctx->md_ctx != NULL ) &&( ctx->hash_of_plaintext ) )
+                {
+                    if( 0 != ( ret = mbedtls_md_update( ctx->md_ctx, output, *olen ) ) )
+                    {
+                        return( ret );
+                    }   
+                }
+            }
+        #endif/* MBEDTLS_CIPHER_HASH */
+            return( ret );
+        }
 
         /* Set output size for encryption */
         *olen = mbedtls_cipher_get_block_size( ctx );
+    #if defined(MBEDTLS_CIPHER_HASH)   
+        if( ( ctx->md_ctx != NULL ) && ( ctx->hash_of_plaintext == 0 ) )
+        {
+            if( 0 != ( ret = mbedtls_md_update( ctx->md_ctx, output, *olen ) ) )
+            {
+                return( ret );
+            }   
+        }
+    #endif/* MBEDTLS_CIPHER_HASH */
         return( 0 );
     }
 #else
     ((void) output);
 #endif /* MBEDTLS_CIPHER_MODE_CBC */
-
     return( MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE );
 }
 
@@ -1103,4 +1244,69 @@ int mbedtls_cipher_auth_decrypt( mbedtls_cipher_context_t *ctx,
 }
 #endif /* MBEDTLS_CIPHER_MODE_AEAD */
 
+#if defined(MBEDTLS_CIPHER_HASH)
+int mbedtls_cipher_and_hash( const mbedtls_cipher_id_t cipher_id,
+                                     const mbedtls_md_info_t* md_info,
+                                     const unsigned char *input,
+                                     size_t ilen,
+                                     const unsigned char *key,
+                                     int key_bitlen,
+                                     const mbedtls_operation_t operation,
+                                     mbedtls_cipher_padding_t mode,
+                                     const unsigned char *iv,
+                                     size_t iv_len,
+                                     unsigned char *cipher_text,
+                                     size_t cipher_text_size,
+                                     size_t *cipher_text_length,
+                                     unsigned char *hash,
+                                     int hash_of_plaintext )
+{
+    int ret = 0;
+    mbedtls_cipher_context_t ctx;
+    mbedtls_cipher_info_t *cipher_info = NULL;
+
+    mbedtls_cipher_init( &ctx );
+
+    cipher_info = mbedtls_cipher_info_from_type( cipher_id );
+    if( cipher_info == NULL )
+        return( MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE );
+    
+    ret = mbedtls_cipher_setup_with_hash( &ctx,
+                                          cipher_info,
+                                          md_info,
+                                          hash_of_plaintext );
+    if( ret != 0 )
+        return( ret );
+
+    ret = mbedtls_cipher_setkey( &ctx, key, key_bitlen, operation );
+    if( ret != 0 )
+        return( ret );
+
+    ret = mbedtls_cipher_set_padding_mode( &ctx, mode );
+    if( ret != 0 )
+        return( ret );  
+    
+    ret =  mbedtls_cipher_set_iv( &ctx, iv, iv_len );
+    if( ret != 0 )
+        return( ret );
+
+    ret = mbedtls_cipher_update( &ctx, input, ilen, cipher_text,
+                                 cipher_text_length );
+    if( ret != 0 )
+        return( ret );
+
+    ret = mbedtls_cipher_finish( &ctx, cipher_text + *cipher_text_length,
+                                 cipher_text_size - *cipher_text_length );
+    if( ret != 0 )
+        return( ret );
+
+    ret = mbedtls_cipher_get_hash( &ctx, hash );
+    if( ret != 0 )
+        return( ret );
+
+    mbedtls_cipher_free( &ctx ); 
+}
+#endif /* MBEDTLS_CIPHER_HASH */
+
 #endif /* MBEDTLS_CIPHER_C */
+

@@ -29,6 +29,8 @@
 #ifndef MBEDTLS_CIPHER_H
 #define MBEDTLS_CIPHER_H
 
+#define MBEDTLS_CIPHER_HASH
+
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "config.h"
 #else
@@ -36,6 +38,10 @@
 #endif
 
 #include <stddef.h>
+
+#if defined(MBEDTLS_CIPHER_HASH)
+#include "md.h"
+#endif
 
 #if defined(MBEDTLS_GCM_C) || defined(MBEDTLS_CCM_C) || defined(MBEDTLS_CHACHAPOLY_C)
 #define MBEDTLS_CIPHER_MODE_AEAD
@@ -291,6 +297,11 @@ typedef struct mbedtls_cipher_context_t
      */
     mbedtls_operation_t operation;
 
+#if defined(MBEDTLS_CIPHER_HASH)
+    mbedtls_md_context_t *md_ctx;
+    int hash_of_plaintext;
+#endif
+
 #if defined(MBEDTLS_CIPHER_MODE_WITH_PADDING)
     /** Padding functions to use, if relevant for
      * the specific cipher mode.
@@ -405,6 +416,30 @@ void mbedtls_cipher_free( mbedtls_cipher_context_t *ctx );
  */
 int mbedtls_cipher_setup( mbedtls_cipher_context_t *ctx, const mbedtls_cipher_info_t *cipher_info );
 
+#if defined(MBEDTLS_CIPHER_HASH)
+int mbedtls_cipher_setup_with_hash( mbedtls_cipher_context_t *ctx,
+                                    const mbedtls_cipher_info_t *cipher_info,
+                                    const mbedtls_md_info_t *md_info,
+                                    int hash_of_plaintext );
+
+int mbedtls_cipher_get_hash( mbedtls_cipher_context_t *ctx, unsigned char *output );
+
+int mbedtls_cipher_and_hash( const mbedtls_cipher_id_t cipher_id,
+                             const mbedtls_md_info_t* md_info,
+                             const unsigned char *input,
+                             size_t ilen,
+                             const unsigned char *key,
+                             int key_bitlen,
+                             const mbedtls_operation_t operation,
+                             mbedtls_cipher_padding_t mode,
+                             const unsigned char *iv,
+                             size_t iv_len,
+                             unsigned char *cipher_text,
+                             size_t cipher_text_size,
+                             size_t *cipher_text_length,
+                             unsigned char *hash,
+                             int hash_of_plaintext );
+#endif                                 
 /**
  * \brief        This function returns the block size of the given cipher.
  *
