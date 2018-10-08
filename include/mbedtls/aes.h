@@ -41,6 +41,8 @@
 #ifndef MBEDTLS_AES_H
 #define MBEDTLS_AES_H
 
+// #define MBEDTLS_CIPHER_HASH
+
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "config.h"
 #else
@@ -49,6 +51,10 @@
 
 #include <stddef.h>
 #include <stdint.h>
+
+#if defined(MBEDTLS_CIPHER_HASH)
+#include "md.h"
+#endif
 
 /* padlock.c and aesni.c rely on these values! */
 #define MBEDTLS_AES_ENCRYPT     1 /**< AES encryption. */
@@ -91,6 +97,11 @@ typedef struct mbedtls_aes_context
                                      <li>Simplifying key expansion in the 256-bit
                                          case by generating an extra round key.
                                          </li></ul> */
+#if defined(MBEDTLS_CIPHER_HASH)
+    mbedtls_md_context_t *md_ctx;
+    int hash_of_plaintext;
+    int is_enc_mode;
+#endif
 }
 mbedtls_aes_context;
 
@@ -163,6 +174,18 @@ void mbedtls_aes_xts_free( mbedtls_aes_xts_context *ctx );
 int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
                     unsigned int keybits );
 
+
+#if defined(MBEDTLS_CIPHER_HASH)
+int mbedtls_aes_setkey_enc_and_hash( mbedtls_aes_context *ctx,
+                                     const unsigned char *key,
+                                     unsigned int keybits,
+                                     const mbedtls_md_info_t *md_info,
+                                     int hash_of_plaintext,
+                                     int is_enc_mode);
+
+int mbedtls_aes_get_hash( mbedtls_aes_context *ctx, unsigned char *output );
+                                     
+#endif //MBEDTLS_CIPHER_HASH
 /**
  * \brief          This function sets the decryption key.
  *
@@ -178,7 +201,13 @@ int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
  */
 int mbedtls_aes_setkey_dec( mbedtls_aes_context *ctx, const unsigned char *key,
                     unsigned int keybits );
-
+#if defined(MBEDTLS_CIPHER_HASH)
+int mbedtls_aes_setkey_dec_and_hash( mbedtls_aes_context *ctx,
+                                     const unsigned char *key,
+                                     unsigned int keybits,
+                                     const mbedtls_md_info_t *md_info,
+                                     int hash_of_plaintext);
+#endif //MBEDTLS_CIPHER_HASH
 #if defined(MBEDTLS_CIPHER_MODE_XTS)
 /**
  * \brief          This function prepares an XTS context for encryption and
