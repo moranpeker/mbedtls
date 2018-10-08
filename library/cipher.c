@@ -391,6 +391,7 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
         {
             return( ret );
         }
+
         return( 0 );
     }
 
@@ -528,6 +529,8 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
         }
 
         *olen = ilen;
+
+        return( 0 );
     }
 #endif /* MBEDTLS_CIPHER_MODE_CFB */
 
@@ -541,6 +544,7 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
         }
 
         *olen = ilen;
+
         return( 0 );
     }
 #endif /* MBEDTLS_CIPHER_MODE_OFB */
@@ -556,6 +560,7 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
         }
 
         *olen = ilen;
+
         return( 0 );
     }
 #endif /* MBEDTLS_CIPHER_MODE_CTR */
@@ -595,6 +600,7 @@ int mbedtls_cipher_update( mbedtls_cipher_context_t *ctx, const unsigned char *i
         return( 0 );
     }
 #endif /* MBEDTLS_CIPHER_MODE_STREAM */
+
     return( MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE );
 }
 
@@ -843,11 +849,8 @@ int mbedtls_cipher_finish( mbedtls_cipher_context_t *ctx,
 
         /* Set output size for decryption */
         if( MBEDTLS_DECRYPT == ctx->operation )
-        {
-            ret = ctx->get_padding( output, mbedtls_cipher_get_block_size( ctx ),
+            return ctx->get_padding( output, mbedtls_cipher_get_block_size( ctx ),
                                      olen );
-            return( ret );
-        }
 
         /* Set output size for encryption */
         *olen = mbedtls_cipher_get_block_size( ctx );
@@ -856,6 +859,7 @@ int mbedtls_cipher_finish( mbedtls_cipher_context_t *ctx,
 #else
     ((void) output);
 #endif /* MBEDTLS_CIPHER_MODE_CBC */
+
     return( MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE );
 }
 
