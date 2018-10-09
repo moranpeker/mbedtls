@@ -1149,7 +1149,7 @@ int mbedtls_cipher_auth_decrypt( mbedtls_cipher_context_t *ctx,
 int mbedtls_cipher_get_hash( mbedtls_cipher_context_t *ctx, unsigned char *output )
 {
     int ret = 0;
-    ret = ctx->cipher_info->base->aes_get_hash_wrap( ctx, output);
+    ret = ctx->cipher_info->base->aes_get_hash_wrap( ctx->cipher_ctx, output);
     return( ret );
 }
 
