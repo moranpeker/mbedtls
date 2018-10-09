@@ -675,3 +675,53 @@ void check_padding( int pad_mode, data_t * input, int ret, int dlen_check
         TEST_ASSERT( dlen == (size_t) dlen_check );
 }
 /* END_CASE */
+
+
+/* BEGIN_CASE */
+void dec_and_hash_test_vec( int cipher_id, data_t * key,
+                       data_t * iv, data_t * cipher,
+                       data_t * clear, data_t * ad, data_t * tag,
+                       int finish_result, int tag_result )
+{
+    unsigned char output[265];
+    unsigned char hash[265];
+    mbedtls_cipher_context_t ctx;
+    size_t outlen, total_len;
+    const mbedtls_md_info_t *md_info = NULL;
+    int hash_of_plaintext = 1;
+    mbedtls_cipher_init( &ctx );
+    int md_type = MBEDTLS_MD_SHA256;
+    memset( output, 0x00, sizeof( output ) );
+    md_info = mbedtls_md_info_from_type( md_type );
+
+    /* Prepare context */
+    TEST_ASSERT( 0 == mbedtls_cipher_setup_with_hash( &ctx,
+                                       mbedtls_cipher_info_from_type( cipher_id ),
+                                       md_info, hash_of_plaintext ) );
+    TEST_ASSERT( 0 == mbedtls_cipher_setkey( &ctx, key->x, 8 * key->len, MBEDTLS_DECRYPT ) );
+    TEST_ASSERT( 0 == mbedtls_cipher_set_iv( &ctx, iv->x, iv->len ) );
+    TEST_ASSERT( 0 == mbedtls_cipher_reset( &ctx ) );
+
+    /* decode buffer and check tag->x */
+    total_len = 0;
+    TEST_ASSERT( 0 == mbedtls_cipher_update( &ctx, cipher->x, cipher->len, output, &outlen ) );
+    total_len += outlen;
+    int ret = mbedtls_cipher_finish( &ctx, output + outlen,
+                                                 &outlen);
+    printf("mmmmmmmmmmmmmmmmmmmmmmmmmmm =  %d", ret);
+    TEST_ASSERT( finish_result == ret );
+    total_len += outlen;
+
+    /* check plaintext only if everything went fine */
+    if( 0 == finish_result && 0 == tag_result )
+    {
+        TEST_ASSERT( total_len == clear->len );
+        TEST_ASSERT( 0 == memcmp( output, clear->x, clear->len ) );
+    }
+
+    mbedtls_cipher_get_hash( &ctx, hash );
+
+exit:
+    mbedtls_cipher_free( &ctx );
+}
+/* END_CASE */

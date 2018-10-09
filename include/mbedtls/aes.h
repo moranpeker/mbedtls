@@ -41,7 +41,7 @@
 #ifndef MBEDTLS_AES_H
 #define MBEDTLS_AES_H
 
-// #define MBEDTLS_CIPHER_HASH
+#define MBEDTLS_CIPHER_HASH
 
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "config.h"
