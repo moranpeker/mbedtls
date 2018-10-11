@@ -1133,6 +1133,7 @@ int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
                     unsigned char *output )
 {
     int i;
+    size_t len = length;
     unsigned char temp[16];
 
     if( length % 16 )
@@ -1186,7 +1187,7 @@ int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
 #if defined(MBEDTLS_CIPHER_HASH)
 {
     int ret = 0;
-    if( 0 != ( ret = mbedtls_aes_hash_update( ctx, input, length, output,
+    if( 0 != ( ret = mbedtls_aes_hash_update( ctx, input - len, length, output - len,
                                               length,
                                               (mode == MBEDTLS_AES_ENCRYPT) ) ) )
     {
@@ -1370,6 +1371,7 @@ int mbedtls_aes_crypt_cfb128( mbedtls_aes_context *ctx,
                        unsigned char *output )
 {
     int c;
+    size_t len = length;
     size_t n = *iv_off;
 
     if( mode == MBEDTLS_AES_DECRYPT )
@@ -1404,7 +1406,7 @@ int mbedtls_aes_crypt_cfb128( mbedtls_aes_context *ctx,
 #if defined(MBEDTLS_CIPHER_HASH)
 {
     int ret = 0;
-    if( 0 != ( ret = mbedtls_aes_hash_update( ctx, input, length, output,
+    if( 0 != ( ret = mbedtls_aes_hash_update( ctx, input - len, length, output - len,
                                                 length,
                                                 (mode == MBEDTLS_AES_ENCRYPT) ) ) )
     {
@@ -1426,6 +1428,7 @@ int mbedtls_aes_crypt_cfb8( mbedtls_aes_context *ctx,
                        const unsigned char *input,
                        unsigned char *output )
 {
+    size_t len = length;
     unsigned char c;
     unsigned char ov[17];
 
@@ -1447,7 +1450,7 @@ int mbedtls_aes_crypt_cfb8( mbedtls_aes_context *ctx,
 #if defined(MBEDTLS_CIPHER_HASH)
 {
     int ret = 0;
-    if( 0 != ( ret = mbedtls_aes_hash_update( ctx, input, length, output,
+    if( 0 != ( ret = mbedtls_aes_hash_update( ctx, input - len, length, output - len,
                                               length,
                                               (mode == MBEDTLS_AES_ENCRYPT) ) ) )
     {
@@ -1471,6 +1474,7 @@ int mbedtls_aes_crypt_ofb( mbedtls_aes_context *ctx,
                            unsigned char *output )
 {
     int ret = 0;
+    size_t len = length;
     size_t n = *iv_off;
 
     while( length-- )
@@ -1488,7 +1492,7 @@ int mbedtls_aes_crypt_ofb( mbedtls_aes_context *ctx,
 
     *iv_off = n;
 #if defined(MBEDTLS_CIPHER_HASH)
-    ret = mbedtls_aes_hash_update( ctx, input, length, output, length,
+    ret = mbedtls_aes_hash_update( ctx, input - len, length, output - len, length,
                                    ctx->is_enc_mode );
 #endif //MBEDTLS_CIPHER_HASH
 
@@ -1535,7 +1539,7 @@ int mbedtls_aes_crypt_ctr( mbedtls_aes_context *ctx,
 #if defined(MBEDTLS_CIPHER_HASH)
 {
     int ret = 0;
-    if( 0 != ( ret = mbedtls_aes_hash_update( ctx, input, len, output, len,
+    if( 0 != ( ret = mbedtls_aes_hash_update( ctx, input - len, len, output - len, len,
                                    ctx->is_enc_mode ) ) )
     {
         return( ret );
