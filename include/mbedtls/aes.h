@@ -177,7 +177,7 @@ int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
 
 #if defined(MBEDTLS_CIPHER_HASH)
 /**
- * \brief          This optional function sets the encryption key and 
+ * \brief          This optional function sets the encryption key and
  *                 hash function for crypt-and-hash.
  *
  * \param ctx               The AES context to which the key should be bound.
@@ -204,7 +204,7 @@ int mbedtls_aes_setkey_enc_and_hash( mbedtls_aes_context *ctx,
 
 /**
  * \brief          This optional function returns the hash values computed for
- *                 for crypt-and-hash operations. Should only be called after 
+ *                 for crypt-and-hash operations. Should only be called after
  *                 completing the crypt operation.
  *
  * \param ctx               The AES context which was used for crypt-and-hash.
@@ -213,7 +213,6 @@ int mbedtls_aes_setkey_enc_and_hash( mbedtls_aes_context *ctx,
  * \return         \c 0 on success.
  */
 int mbedtls_aes_get_hash( mbedtls_aes_context *ctx, unsigned char *output );
-                                     
 #endif //MBEDTLS_CIPHER_HASH
 /**
  * \brief          This function sets the decryption key.
@@ -232,7 +231,7 @@ int mbedtls_aes_setkey_dec( mbedtls_aes_context *ctx, const unsigned char *key,
                     unsigned int keybits );
 #if defined(MBEDTLS_CIPHER_HASH)
 /**
- * \brief          This optional function sets the encryption key and 
+ * \brief          This optional function sets the encryption key and
  *                 hash function for crypt-and-hash.
  *
  * \param ctx               The AES context to which the key should be bound.

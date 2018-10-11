@@ -113,7 +113,7 @@ struct mbedtls_cipher_base_t
                                         int hash_of_plaintext );
 
     int (*aes_get_hash_wrap)( void *ctx, unsigned char *output );
-#endif 
+#endif
     /** Allocate a new context */
     void * (*ctx_alloc_func)( void );
 

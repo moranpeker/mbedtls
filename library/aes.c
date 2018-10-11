@@ -729,7 +729,6 @@ int mbedtls_aes_setkey_enc_and_hash( mbedtls_aes_context *ctx,
     ret = mbedtls_md_starts( ctx->md_ctx );
     if ( ret != 0 )
         return( ret );
-    
     return( 0 );
 }
 #endif /* MBEDTLS_CIPHER_HASH */
@@ -830,7 +829,6 @@ int mbedtls_aes_setkey_dec_and_hash( mbedtls_aes_context *ctx,
     ret = mbedtls_md_starts( ctx->md_ctx );
     if ( ret != 0 )
         return( ret );
-    
     return( 0 );
 }
 #endif /* MBEDTLS_CIPHER_HASH */

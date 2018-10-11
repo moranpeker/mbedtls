@@ -449,7 +449,7 @@ int mbedtls_cipher_setup_with_hash( mbedtls_cipher_context_t *ctx,
 /**
  * \brief               This function returns the hash value created during a crypt-and-hash.
  *                      This value is only created if mbedtls_cipher_setup_with_hash is called
- *                      and a supported algorithms are chosen.Should only be called after 
+ *                      and a supported algorithms are chosen.Should only be called after
  *                      completing the crypt operation (e.g. after mbedtls_cipher_finish).
  *
  * \param ctx           The context of the cipher. Must be initialized.
@@ -477,7 +477,6 @@ int mbedtls_cipher_get_hash( mbedtls_cipher_context_t *ctx, unsigned char *outpu
  *                      supported by encrypt-and-hash:
  *                      ciphers: AES-CBC, AES-CTR, AES-OFB, AES-CFB
  *                      hashes: SHA-1, SHA-224, SHA-256
- *                      
  *
  * \param cipher_id             The ID of the cipher to use.
  * \param md_info               The hash to use.
@@ -485,7 +484,7 @@ int mbedtls_cipher_get_hash( mbedtls_cipher_context_t *ctx, unsigned char *outpu
  * \param key                   The key to use.
  * \param key_bitlen            The key length to use, in bits.
  * \param operation             The operation that the key will be used for:
- *                              #MBEDTLS_ENCRYPT or #MBEDTLS_DECRYPT.  
+ *                              #MBEDTLS_ENCRYPT or #MBEDTLS_DECRYPT.
  * \param iv                    The IV to use, or NONCE_COUNTER for CTR-mode ciphers.
  * \param iv_len                The IV length for ciphers with variable-size IV.
  *                              This parameter is discarded by ciphers with fixed-size
@@ -527,7 +526,8 @@ int mbedtls_cipher_and_hash( const mbedtls_cipher_id_t cipher_id,
                              size_t *cipher_text_length,
                              unsigned char *hash,
                              int hash_of_plaintext );
-#endif                                 
+#endif
+
 /**
  * \brief        This function returns the block size of the given cipher.
  *

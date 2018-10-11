@@ -280,7 +280,7 @@ static const mbedtls_cipher_base_t aes_info = {
     aes_setkey_enc_and_hash_wrap,
     aes_setkey_dec_and_hash_wrap,
     aes_get_hash_wrap,
-#endif 
+#endif
     aes_ctx_alloc,
     aes_ctx_free
 };
@@ -517,7 +517,7 @@ static const mbedtls_cipher_base_t xts_aes_info = {
 #endif
     xts_aes_setkey_enc_wrap,
     xts_aes_setkey_dec_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -580,7 +580,7 @@ static const mbedtls_cipher_base_t gcm_aes_info = {
 #endif
     gcm_aes_setkey_wrap,
     gcm_aes_setkey_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -654,7 +654,7 @@ static const mbedtls_cipher_base_t ccm_aes_info = {
 #endif
     ccm_aes_setkey_wrap,
     ccm_aes_setkey_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -792,7 +792,7 @@ static const mbedtls_cipher_base_t camellia_info = {
 #endif
     camellia_setkey_enc_wrap,
     camellia_setkey_dec_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -970,7 +970,7 @@ static const mbedtls_cipher_base_t gcm_camellia_info = {
 #endif
     gcm_camellia_setkey_wrap,
     gcm_camellia_setkey_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -1044,7 +1044,7 @@ static const mbedtls_cipher_base_t ccm_camellia_info = {
 #endif
     ccm_camellia_setkey_wrap,
     ccm_camellia_setkey_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -1183,7 +1183,7 @@ static const mbedtls_cipher_base_t aria_info = {
 #endif
     aria_setkey_enc_wrap,
     aria_setkey_dec_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -1361,7 +1361,7 @@ static const mbedtls_cipher_base_t gcm_aria_info = {
 #endif
     gcm_aria_setkey_wrap,
     gcm_aria_setkey_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -1435,7 +1435,7 @@ static const mbedtls_cipher_base_t ccm_aria_info = {
 #endif
     ccm_aria_setkey_wrap,
     ccm_aria_setkey_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -1622,7 +1622,7 @@ static const mbedtls_cipher_base_t des_info = {
 #endif
     des_setkey_enc_wrap,
     des_setkey_dec_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -1678,7 +1678,7 @@ static const mbedtls_cipher_base_t des_ede_info = {
 #endif
     des3_set2key_enc_wrap,
     des3_set2key_dec_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -1734,7 +1734,7 @@ static const mbedtls_cipher_base_t des_ede3_info = {
 #endif
     des3_set3key_enc_wrap,
     des3_set3key_dec_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -1854,7 +1854,7 @@ static const mbedtls_cipher_base_t blowfish_info = {
 #endif
     blowfish_setkey_wrap,
     blowfish_setkey_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -1975,7 +1975,7 @@ static const mbedtls_cipher_base_t arc4_base_info = {
 #endif
     arc4_setkey_wrap,
     arc4_setkey_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -2065,7 +2065,7 @@ static const mbedtls_cipher_base_t chacha20_base_info = {
 #endif
     chacha20_setkey_wrap,
     chacha20_setkey_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -2142,7 +2142,7 @@ static const mbedtls_cipher_base_t chachapoly_base_info = {
 #endif
     chachapoly_setkey_wrap,
     chachapoly_setkey_wrap,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
@@ -2215,7 +2215,7 @@ static const mbedtls_cipher_base_t null_base_info = {
 #endif
     null_setkey,
     null_setkey,
-#if defined(MBEDTLS_CIPHER_HASH)    
+#if defined(MBEDTLS_CIPHER_HASH)
     NULL,
     NULL,
     NULL,
